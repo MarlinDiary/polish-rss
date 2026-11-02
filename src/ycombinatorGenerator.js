@@ -1,8 +1,8 @@
 import RSS from 'rss';
 import * as cheerio from 'cheerio';
 import { config } from './config.js';
-import { fetchHackerNewsRSS, fetchArticle } from './fetcher.js';
-import { parseRSSFeed } from './scraper.js';
+import { fetchArticle } from './fetcher.js';
+import { fetchHackerNewsApiArticles } from './hackerNewsApi.js';
 import { articleCache, getOrSet } from './cache.js';
 
 function escapeHtml(str) {
@@ -253,10 +253,9 @@ async function getBeautifiedDescription(article) {
   });
 }
 
-export async function generateHackerNewsRSS(baseUrl) {
+export async function generateHackerNewsRSS(baseUrl, { loadArticles = fetchHackerNewsApiArticles } = {}) {
   try {
-    const originalRssXml = await fetchHackerNewsRSS();
-    const articles = parseRSSFeed(originalRssXml);
+    const articles = await loadArticles();
 
     console.log(`Found ${articles.length} articles in Hacker News RSS feed`);
 
